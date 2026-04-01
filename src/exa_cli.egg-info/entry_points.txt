@@ -1,0 +1,2 @@
+[console_scripts]
+exa = exa_cli.main:cli

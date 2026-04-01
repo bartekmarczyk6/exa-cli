@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "exa-cli"
+version = "0.1.0"
+description = "A powerful command-line interface for the Exa Search API"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Bartek Marczyk", email = "your.email@example.com"}
+]
+dependencies = [
+    "httpx>=0.24.0",
+    "click>=8.1.0",
+    "rich>=13.0.0",
+    "pydantic>=2.0.0",
+    "httpx-sse>=0.3.0"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Environment :: Console",
+]
+
+[project.urls]
+Homepage = "https://github.com/YOUR_GITHUB_USERNAME/exa-cli"
+Repository = "https://github.com/YOUR_GITHUB_USERNAME/exa-cli"
+Issues = "https://github.com/YOUR_GITHUB_USERNAME/exa-cli/issues"
+
+[project.scripts]
+exa = "exa_cli.main:cli"

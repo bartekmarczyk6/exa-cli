@@ -1,0 +1,39 @@
+Metadata-Version: 2.4
+Name: exa-cli
+Version: 0.1.0
+Summary: CLI tool for Exa API
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: httpx>=0.24.0
+Requires-Dist: click>=8.1.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: httpx-sse>=0.3.0
+
+# Exa CLI
+
+A command-line interface for the Exa API.
+
+## Installation
+
+```bash
+pip install -e .
+```
+
+## Usage
+
+Set your API key:
+```bash
+export EXA_API_KEY="your-api-key"
+```
+
+### Commands
+
+- `exa auth login`
+- `exa auth status`
+- `exa search "query"`
+- `exa find-similar "https://example.com"`
+- `exa contents "https://example.com"`
+- `exa answer "question"`
+- `exa research create "instructions"`
+- `exa research get <task_id>`
