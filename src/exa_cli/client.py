@@ -27,6 +27,8 @@ class ExaClient:
                         continue
                 if response.status_code >= 400:
                     handle_api_error(response)
+                if response.status_code == 204 or not response.content:
+                    return {}
                 return response.json()
 
     def post(self, endpoint, json=None):
