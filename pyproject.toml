@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0", "setuptools_scm[toml]>=8.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "exa-cli"
-version = "0.1.0"
+dynamic = ["version"]
 description = "A powerful command-line interface for the Exa Search API"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -27,9 +27,12 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/YOUR_GITHUB_USERNAME/exa-cli"
-Repository = "https://github.com/YOUR_GITHUB_USERNAME/exa-cli"
-Issues = "https://github.com/YOUR_GITHUB_USERNAME/exa-cli/issues"
+Homepage = "https://github.com/bartekmarczyk6/exa-cli"
+Repository = "https://github.com/bartekmarczyk6/exa-cli"
+Issues = "https://github.com/bartekmarczyk6/exa-cli/issues"
 
 [project.scripts]
 exa = "exa_cli.main:cli"
+
+[tool.setuptools_scm]
+version_file = "src/exa_cli/_version.py"

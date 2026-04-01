@@ -14,10 +14,9 @@ def research():
 @click.argument("instructions")
 @click.option("--model", type=click.Choice(["exa-research", "exa-research-pro"]), default="exa-research")
 @click.option("--output-schema")
-@click.option("--infer-schema", is_flag=True)
 @click.option("--poll", is_flag=True, help="Wait for completion")
 @click.pass_context
-def create(ctx, instructions, model, output_schema, infer_schema, poll):
+def create(ctx, instructions, model, output_schema, poll):
     """Create a research task."""
     api_key = get_api_key(ctx.obj.get('API_KEY'))
     if not api_key:
@@ -29,7 +28,6 @@ def create(ctx, instructions, model, output_schema, infer_schema, poll):
     payload = {
         "instructions": instructions,
         "model": model,
-        "inferSchema": infer_schema
     }
     if output_schema:
         payload["outputSchema"] = parse_schema(output_schema)
