@@ -64,8 +64,14 @@ def print_research_task(data):
     console.print(f"[bold]Task ID:[/bold] {data.get('id')}")
     console.print(f"[bold]Status:[/bold] {data.get('status')}")
     if data.get("status") == "completed":
-        console.print("\n[bold]Output:[/bold]")
-        console.print_json(data=data.get("output", {}))
+        # The Exa Research API returns completed task content under "data";
+        # fall back to "output" for backwards compatibility with older responses.
+        result = data.get("data") or data.get("output")
+        if result:
+            console.print("\n[bold]Output:[/bold]")
+            console.print_json(data=result)
+        else:
+            console.print("\n[bold]Output:[/bold] (no content returned)")
 
 def output_results(data, format_type, command_type="search", **kwargs):
     if format_type == "json":

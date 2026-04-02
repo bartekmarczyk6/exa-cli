@@ -152,25 +152,26 @@ def test_research_create():
 
 @respx.mock
 def test_research_create_poll():
-    """Test poll flow handles empty-ish response (the original bug scenario)."""
+    """Test poll flow displays research content from the 'data' key (actual API response shape)."""
     import unittest.mock as mock
 
     respx.post(f"{BASE}/research/v0/tasks").mock(
         return_value=httpx.Response(200, json={"id": "task-1", "status": "running"})
     )
     respx.get(f"{BASE}/research/v0/tasks/task-1").mock(
-        return_value=httpx.Response(200, json={"id": "task-1", "status": "completed", "output": "done"})
+        return_value=httpx.Response(200, json={"id": "task-1", "status": "completed", "data": {"summary": "done"}})
     )
     runner = CliRunner()
     with mock.patch("time.sleep"):
         result = runner.invoke(cli, ["--api-key", "test-key", "research", "create", "analyze AI", "--poll"])
     assert result.exit_code == 0, result.output
+    assert "Output" in result.output
 
 
 @respx.mock
 def test_research_get():
     respx.get(f"{BASE}/research/v0/tasks/task-1").mock(
-        return_value=httpx.Response(200, json={"id": "task-1", "status": "completed", "output": "done"})
+        return_value=httpx.Response(200, json={"id": "task-1", "status": "completed", "data": {"summary": "done"}})
     )
     runner = CliRunner()
     result = runner.invoke(cli, ["--api-key", "test-key", "research", "get", "task-1"])
