@@ -1,7 +1,7 @@
 import click
 from ..client import ExaClient
 from ..config import get_api_key
-from ..formatters import output_results
+from ..formatters import output_results, print_error
 
 @click.command()
 @click.argument("urls", nargs=-1, required=True)
@@ -26,8 +26,8 @@ def contents(ctx, urls, text, text_max_chars, highlights, highlights_max_chars,
     """Get contents of specific URLs."""
     api_key = get_api_key(ctx.obj.get('API_KEY'))
     if not api_key:
-        click.secho("API key required. Set EXA_API_KEY or use --api-key.", fg="red")
-        raise click.Abort()
+        print_error("API key required", fix="Set EXA_API_KEY env var or pass --api-key <key>")
+        raise SystemExit(1)
 
     client = ExaClient(api_key)
     

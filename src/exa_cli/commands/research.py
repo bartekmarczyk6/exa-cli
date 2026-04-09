@@ -2,7 +2,7 @@ import click
 import time
 from ..client import ExaClient
 from ..config import get_api_key
-from ..formatters import output_results
+from ..formatters import output_results, print_error
 from .search import parse_schema
 
 @click.group()
@@ -21,8 +21,8 @@ def create(ctx, instructions, model, output_schema, poll, output):
     """Create a research task."""
     api_key = get_api_key(ctx.obj.get('API_KEY'))
     if not api_key:
-        click.secho("API key required. Set EXA_API_KEY or use --api-key.", fg="red")
-        raise click.Abort()
+        print_error("API key required", fix="Set EXA_API_KEY env var or pass --api-key <key>")
+        raise SystemExit(1)
 
     client = ExaClient(api_key)
     
@@ -55,8 +55,8 @@ def get(ctx, task_id, output):
     """Get status of a research task."""
     api_key = get_api_key(ctx.obj.get('API_KEY'))
     if not api_key:
-        click.secho("API key required. Set EXA_API_KEY or use --api-key.", fg="red")
-        raise click.Abort()
+        print_error("API key required", fix="Set EXA_API_KEY env var or pass --api-key <key>")
+        raise SystemExit(1)
 
     client = ExaClient(api_key)
     data = client.get(f"/research/v0/tasks/{task_id}")
