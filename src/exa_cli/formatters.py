@@ -73,6 +73,125 @@ def print_research_task(data):
         else:
             console.print("\n[bold]Output:[/bold] (no content returned)")
 
+# ---------------------------------------------------------------------------
+# TOON (Token-Oriented Object Notation) formatters
+# ---------------------------------------------------------------------------
+
+TOON_TRUNCATE_LIMIT = 500
+
+def truncate(text, limit=TOON_TRUNCATE_LIMIT):
+    """Truncate a string to limit chars; append hint with total size."""
+    if text is None:
+        return ""
+    text = str(text)
+    if len(text) <= limit:
+        return text
+    return f"{text[:limit]}\n    ... (truncated, {len(text)} chars total)"
+
+def toon_row(values):
+    """Format a list of values as a single indented TOON row."""
+    return "  " + ",".join(str(v) for v in values)
+
+DEFAULT_RESULT_FIELDS = ["title", "url", "score"]
+
+def print_toon_results(results, fields=None, show_text=False,
+                       show_highlights=False, query=None):
+    """Emit results in TOON format."""
+    if fields is None:
+        fields = DEFAULT_RESULT_FIELDS
+
+    if not results:
+        q_hint = f' for "{query}"' if query else ""
+        print(f"results: 0 found{q_hint}")
+        return
+
+    # Header
+    print(f"results[{len(results)}]{{{','.join(fields)}}}:")
+
+    for res in results:
+        row = []
+        for f in fields:
+            if f == "score":
+                row.append(f"{res.get('score', 0):.3f}")
+            elif f == "publishedDate":
+                v = res.get("publishedDate", "")
+                row.append(v[:10] if v else "")
+            else:
+                row.append(res.get(f, ""))
+        print(toon_row(row))
+
+    # Long-form content blocks
+    for i, res in enumerate(results):
+        extras = []
+        if show_text and "text" in res:
+            extras.append(("text", res["text"]))
+        if show_highlights and "highlights" in res:
+            for h in res.get("highlights", []):
+                extras.append(("highlight", h))
+        if "summary" in res:
+            extras.append(("summary", res["summary"]))
+
+        if extras:
+            print(f"\nresult[{i+1}] {res.get('title', '')}:")
+            for label, content in extras:
+                print(f"  {label}: {truncate(content)}")
+
+    # Help hints
+    hints = []
+    if not show_text:
+        hints.append("Run `exa search <query> --text` to include page text")
+    if not show_highlights:
+        hints.append("Run `exa search <query> --highlights` to include highlights")
+    hints.append("Run `exa search <query> --output json` for raw JSON")
+
+    if hints:
+        print(f"\nhelp[{len(hints)}]:")
+        for h in hints:
+            print(f"  {h}")
+
+
+def print_toon_answer(data):
+    """Emit answer + citations in TOON format."""
+    answer = data.get("answer", "")
+    print(f"answer:\n  {truncate(answer)}")
+
+    citations = data.get("citations", [])
+    if citations:
+        print(f"\ncitations[{len(citations)}]{{title,url}}:")
+        for cit in citations:
+            print(toon_row([cit.get("title", ""), cit.get("url", "")]))
+    else:
+        print("\ncitations: none")
+
+
+def print_toon_research(data):
+    """Emit research task status in TOON format."""
+    task_id = data.get("id", "")
+    status = data.get("status", "unknown")
+    print(f"task:\n  id: {task_id}\n  status: {status}")
+
+    if status == "completed":
+        result = data.get("data") or data.get("output")
+        if result:
+            raw = json.dumps(result)
+            print(f"\noutput:\n  {truncate(raw, limit=800)}")
+            if len(raw) > 800:
+                print(f"\nhelp[1]:\n  Run `exa research get {task_id} --output json` for full output")
+        else:
+            print("\noutput: (empty)")
+    elif status == "failed":
+        print(f"\nerror: task {task_id} failed")
+    else:
+        print(f"\nhelp[1]:\n  Run `exa research get {task_id}` to check status")
+
+
+def print_error(message, fix=None):
+    """Emit a structured error on stdout (not stderr) for agent readability."""
+    print(f"error: {message}")
+    if fix:
+        print(f"help: {fix}")
+
+
 def output_results(data, format_type, command_type="search", **kwargs):
     if format_type == "json":
         print_json(data)
@@ -82,9 +201,23 @@ def output_results(data, format_type, command_type="search", **kwargs):
         results = data.get("results", [])
         if format_type == "csv":
             print_csv(results)
+        elif format_type == "toon":
+            print_toon_results(
+                results,
+                fields=kwargs.get("fields"),
+                show_text=kwargs.get("show_text"),
+                show_highlights=kwargs.get("show_highlights"),
+                query=kwargs.get("query"),
+            )
         else:
             print_table_results(results, show_text=kwargs.get("show_text"), show_highlights=kwargs.get("show_highlights"))
     elif command_type == "answer":
-        print_answer(data)
+        if format_type == "toon":
+            print_toon_answer(data)
+        else:
+            print_answer(data)
     elif command_type == "research":
-        print_research_task(data)
+        if format_type == "toon":
+            print_toon_research(data)
+        else:
+            print_research_task(data)
