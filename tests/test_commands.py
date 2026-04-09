@@ -165,7 +165,7 @@ def test_research_create_poll():
     with mock.patch("time.sleep"):
         result = runner.invoke(cli, ["--api-key", "test-key", "research", "create", "analyze AI", "--poll"])
     assert result.exit_code == 0, result.output
-    assert "Output" in result.output
+    assert "output:" in result.output  # TOON format
 
 
 @respx.mock

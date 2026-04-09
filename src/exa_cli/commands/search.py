@@ -42,14 +42,15 @@ def parse_schema(schema_str):
 @click.option("--subpage-target")
 @click.option("--extras-links", type=int)
 @click.option("--extras-image-links", type=int)
-@click.option("-o", "--output", type=click.Choice(["json", "table", "csv"]), default="table")
+@click.option("-o", "--output", type=click.Choice(["json", "table", "csv", "toon"]), default="toon")
+@click.option("--fields", help="Comma-separated fields to include in toon output (e.g. title,url,score)")
 @click.pass_context
 def search(ctx, query, search_type, category, num_results, include_domains, exclude_domains,
            start_published_date, end_published_date, start_crawl_date, end_crawl_date,
            include_text, exclude_text, moderation, user_location, system_prompt, output_schema,
            additional_queries, text, text_max_chars, highlights, highlights_max_chars,
            highlights_query, summary, summary_query, livecrawl, subpages, subpage_target,
-           extras_links, extras_image_links, output):
+           extras_links, extras_image_links, output, fields):
     """Search the web using Exa."""
     api_key = get_api_key(ctx.obj.get('API_KEY'))
     if not api_key:
@@ -103,4 +104,7 @@ def search(ctx, query, search_type, category, num_results, include_domains, excl
         payload["contents"] = contents
 
     data = client.post("/search", json=payload)
-    output_results(data, output, command_type="search", show_text=text, show_highlights=highlights)
+    output_results(data, output, command_type="search",
+                   show_text=text, show_highlights=highlights,
+                   fields=fields.split(",") if fields else None,
+                   query=query)

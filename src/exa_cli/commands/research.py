@@ -15,8 +15,9 @@ def research():
 @click.option("--model", type=click.Choice(["exa-research", "exa-research-pro"]), default="exa-research")
 @click.option("--output-schema")
 @click.option("--poll", is_flag=True, help="Wait for completion")
+@click.option("-o", "--output", type=click.Choice(["json", "table", "toon"]), default="toon")
 @click.pass_context
-def create(ctx, instructions, model, output_schema, poll):
+def create(ctx, instructions, model, output_schema, poll, output):
     """Create a research task."""
     api_key = get_api_key(ctx.obj.get('API_KEY'))
     if not api_key:
@@ -40,16 +41,17 @@ def create(ctx, instructions, model, output_schema, poll):
         while True:
             status_data = client.get(f"/research/v0/tasks/{task_id}")
             if status_data.get("status") in ("completed", "failed"):
-                output_results(status_data, "table", command_type="research")
+                output_results(status_data, output, command_type="research")
                 break
             time.sleep(5)
     else:
-        output_results(data, "table", command_type="research")
+        output_results(data, output, command_type="research")
 
 @research.command()
 @click.argument("task_id")
+@click.option("-o", "--output", type=click.Choice(["json", "table", "toon"]), default="toon")
 @click.pass_context
-def get(ctx, task_id):
+def get(ctx, task_id, output):
     """Get status of a research task."""
     api_key = get_api_key(ctx.obj.get('API_KEY'))
     if not api_key:
@@ -58,4 +60,4 @@ def get(ctx, task_id):
 
     client = ExaClient(api_key)
     data = client.get(f"/research/v0/tasks/{task_id}")
-    output_results(data, "table", command_type="research")
+    output_results(data, output, command_type="research")

@@ -8,7 +8,7 @@ from ..formatters import output_results
 @click.argument("query")
 @click.option("--stream", is_flag=True, help="Enable SSE streaming")
 @click.option("--text", is_flag=True, help="Include full text in citations")
-@click.option("-o", "--output", type=click.Choice(["json", "table", "csv"]), default="table")
+@click.option("-o", "--output", type=click.Choice(["json", "table", "toon"]), default="toon")
 @click.pass_context
 def answer(ctx, query, stream, text, output):
     """Answer a question using Exa."""

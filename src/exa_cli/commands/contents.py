@@ -17,11 +17,12 @@ from ..formatters import output_results
 @click.option("--subpage-target")
 @click.option("--extras-links", type=int)
 @click.option("--extras-image-links", type=int)
-@click.option("-o", "--output", type=click.Choice(["json", "table", "csv"]), default="table")
+@click.option("-o", "--output", type=click.Choice(["json", "table", "csv", "toon"]), default="toon")
+@click.option("--fields", help="Comma-separated fields for toon output")
 @click.pass_context
 def contents(ctx, urls, text, text_max_chars, highlights, highlights_max_chars,
              highlights_query, summary, summary_query, livecrawl, subpages, subpage_target,
-             extras_links, extras_image_links, output):
+             extras_links, extras_image_links, output, fields):
     """Get contents of specific URLs."""
     api_key = get_api_key(ctx.obj.get('API_KEY'))
     if not api_key:
@@ -52,4 +53,6 @@ def contents(ctx, urls, text, text_max_chars, highlights, highlights_max_chars,
         if extras_image_links: payload["extras"]["imageLinks"] = extras_image_links
 
     data = client.post("/contents", json=payload)
-    output_results(data, output, command_type="contents", show_text=text, show_highlights=highlights)
+    output_results(data, output, command_type="contents",
+                   show_text=text, show_highlights=highlights,
+                   fields=fields.split(",") if fields else None)
